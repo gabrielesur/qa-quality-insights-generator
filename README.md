@@ -1,133 +1,89 @@
-# Welcome to Vinted!
+# QA Quality Insights Generator
+# Overview
 
-We, engineers at Vinted, are striving to provide the best solutions for business-side problems which scale, last and
-require minimal maintenance. Our code is clean, well-tested and flexible and we are not afraid to touch legacy code,
-re-evaluate it and rework it if necessary. We hope that our new colleagues appreciate the same values and stick to
-best-practices.
+As part of our testing transition initiative, the role of QA is evolving beyond test execution toward providing broader quality insights to teams.
 
-## Backend Take-Home Task
+This repository contains an early-stage, QA-owned tool aimed at helping QAs generate monthly quality insights by aggregating and interpreting data from existing systems (e.g. Jira, metrics tools). The goal is to make quality trends, risks, and recurring issues more visible and easier to discuss within teams.
 
-In this take-home task we ask you to review a piece of code that solves a problem described in the [Problem](#problem)
-section. When reviewing the code, assume that it has been proposed by one of your colleagues and is intended for
-production use. Feel free to give your suggestions on code quality, software design, do not hesitate to point out
-possible performance or security issues and trade-offs if you find any. Also, be constructive with your suggestions. 
-This task should take at most one or two hours of your precious time.
+⚠️ This project is currently in an early, experimental stage.
 
-Due to technical limitations of GitHub classrooms you need to perform such git commands after checking out the repo (to refresh git history):
+# Motivation
 
-```bash
-git checkout origin/homework -b homework
-git rebase -Xtheirs main
-git push -f
-```
+As part of our company’s testing transition initiative, the role of QA is evolving.
+QA is no longer focused only on test execution, but also on activities that help improve a team’s overall quality and quality assurance practices.
 
-Then open a pull request from the branch `homework` to the `main` branch. Once your pull request is open, you can proceed with the take home task and use the pull request for comments.
+One of the key statements from this initiative highlights that:
 
-### The Problem
+Teams benefit from additional quality insights provided by QA.
 
-When a Vinted member purchases an item, it has to be shipped and Vinted provides various shipping options. Let's focus
-on France. In France, it is allowed to ship ether via 'Mondial Relay' (MR in short) or 'La Poste' (LP). While 'La Poste'
-provides usual courier delivery services, 'Mondial Relay' allows you to drop and pick up a shipment at drop-off and
-pickup locations, thus being less convenient but cheaper and much more sustainable.
+This raised an important question:
+How can QAs practically and consistently provide those quality insights to their teams?
 
-Each item, depending on its size gets an appropriate package size assigned to it:
+# What Problem This Aims to Solve
 
-  * S - Small, a popular option to ship jewelry.
-  * M - Medium - clothes and similar items.
-  * L - Large - mostly shoes.
+Fragmented quality data across tools
 
-Shipping prices depend on a package size and a provider:
+Manual and inconsistent quality reporting
 
-| Provider     | Package Size | Price  |
-|--------------|--------------|--------|
-| LP           | S            | 1.50 € |
-| LP           | M            | 4.90 € |
-| LP           | L            | 6.90 € |
-| MR           | S            | 2 €    |
-| MR           | M            | 3 €    |
-| MR           | L            | 4 €    |
+Limited visibility into quality trends over time
 
-Usually, the whole shipping price is covered by the buyer but sometimes, in order to promote one or another shipping
-provider, Vinted covers a part of the shipping price by offering discounts.
+Difficulty sharing QA insights beyond individual conversations
 
-These are the shipping discount rules applicable to purchased items:
+# Proposed Solution
 
-  * All S size shipments should always match the lowest S package price among the providers.
-  * The third L shipment via LP should be free, but only once a calendar month.
-  * Accumulated discounts cannot exceed 10 € in a calendar month. If there are not enough funds to fully cover a
-    discount this calendar month, it should be covered partially.
+Build a lightweight automation tool that:
 
-Members' transactions are listed in a file 'input.txt', each line contains: a date in the specified format, a package
-size code and a provider code separated with a whitespaces:
+Collects quality-related data from existing systems (starting with Jira)
 
-```
-2015-02-01 S MR
-2015-02-02 S MR
-2015-02-03 L LP
-2015-02-05 S LP
-2015-02-06 S MR
-2015-02-06 L LP
-2015-02-07 L MR
-2015-02-08 M MR
-2015-02-09 L LP
-2015-02-10 L LP
-2015-02-10 S MR
-2015-02-10 S MR
-2015-02-11 L LP
-2015-02-12 M MR
-2015-02-13 M LP
-2015-02-15 S MR
-2015-02-17 L LP
-2015-02-17 S MR
-2015-02-24 L LP
-2015-03-01 S MR
-```
+Aggregates and compares data month-over-month
 
-The solution should output transactions and append a reduced shipment price with a shipment discount (or a '-' if there
-is no discount).
+Applies simple, rule-based logic to identify quality signals
 
-```
-2015-02-01 S MR 1.50 0.50
-2015-02-02 S MR 1.50 0.50
-2015-02-03 L LP 6.90 -
-2015-02-05 S LP 1.50 -
-2015-02-06 S MR 1.50 0.50
-2015-02-06 L LP 6.90 -
-2015-02-07 L MR 4.00 -
-2015-02-08 M MR 3.00 -
-2015-02-09 L LP 0.00 6.90
-2015-02-10 L LP 6.90 -
-2015-02-10 S MR 1.50 0.50
-2015-02-10 S MR 1.50 0.50
-2015-02-11 L LP 6.90 -
-2015-02-12 M MR 3.00 -
-2015-02-13 M LP 4.90 -
-2015-02-15 S MR 1.50 0.50
-2015-02-17 L LP 6.90 -
-2015-02-17 S MR 1.90 0.10
-2015-02-24 L LP 6.90 -
-2015-03-01 S MR 1.50 0.50
-```
+Generates a monthly Quality Insights report that QAs can optionally share with their teams
 
-### Requirements
+# MVP Scope (Planned)
 
-* At Vinted we strive to write clean and simple and easy-to-maintain code, covered with unit tests. We also put a high
-  value on consistency and following [language code style](https://github.com/bbatsov/ruby-style-guide). The solution
-  should match this philosophy.
-* The design should be flexible enough to allow adding new rules and modifying existing ones easily.
-* Short documentation of design decisions and assumptions can be provided in the code itself or a README.
-* Make sure your input data is loaded from a file (default name 'input.txt' is assumed).
-* Make sure the solution outputs data to the screen (STDOUT) in a format described in the example above.
+The initial MVP is intentionally small and focused.
 
-## Solution
+Planned MVP capabilities:
 
-Now that we are done with describing the take-home task, let us proceed to the reviewing part. The best place to start
-is the [SOLUTION.md](SOLUTION.md) that will guide you through the decisions and the philosophy of the code author.
+Retrieve bug data from Jira for a given month
 
-Have fun!
+Calculate basic metrics (e.g. total bugs, severity distribution, month-over-month comparison)
 
----
-### Important
-*Vinted, UAB collects, uses and stores your provided information to assess your suitability to enter into employment contract and suggest a job offer for you (we have the intention to enter into a contract with you (Art. 6 (1) (b) of GDPR). For more information on how Vinted, UAB uses your data and your rights, please see Vinted Job Applicant Privacy Policy available here: https://www.vinted.com/jobs/policy*
+Identify 1–2 simple quality trends or risks
 
-*By submitting the response to the given task, you hereby consent that Vinted, UAB shall have the right to reproduce and use the response that you submit for the purpose of its recruitment processes, which will be anonymised after your recruitment process.*
+Generate a readable monthly quality insights document (Markdown or similar)
+
+# Future Ideas
+
+Potential extensions beyond MVP:
+
+Integration with eazyBI and analytics tools
+
+Deeper insight generation (defect leakage, recurring issues, root cause patterns)
+
+Visualization of trends over time
+
+Automated publishing to Confluence or Slack
+
+Team- or component-specific quality views
+
+# Status
+
+This repository currently contains planning and documentation only.
+Implementation will be added incrementally as part of experimentation and feedback.
+
+# Contributing
+
+This project welcomes feedback and collaboration from the QA community:
+
+Suggestions for meaningful quality metrics
+
+Examples of useful quality insights
+
+Ideas for improving QA visibility and impact
+
+Disclaimer
+
+This tool is intended as an enablement and insight aid, not as a mandatory reporting or performance tracking mechanism.
