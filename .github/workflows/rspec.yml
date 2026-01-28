@@ -1,0 +1,23 @@
+name: CI RSpec Tests
+
+on:
+  push:
+   paths:
+   - '*'
+  pull_request:
+    paths:
+    - '*'
+
+jobs:
+  test:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+      - name: Install dependencies
+        run: bundle install
+      - name: Run specs
+        run: bundle exec rspec
